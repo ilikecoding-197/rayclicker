@@ -14,6 +14,7 @@ add_executable(rayclicker)
 target_sources(rayclicker
 PRIVATE
 	src/main.c
+  src/game.c
 )
 
 # C99
