@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "raygui.h"
 #include "result.h"
+#include "ui.h"
 
 #define TITLE "Rayclicker"
 
@@ -27,28 +28,44 @@ Result Game_init(Game *game, int width, int height) {
     return RES_OK;
 }
 
+#define BTN_WIDTH 100
+#define BTN_HEIGHT 100
+
+void center_point(Vector2 *p, Rectangle *bounds) {
+    p->x = bounds->x + bounds->width / 2;
+    p->y = bounds->y + bounds->height / 2;
+}
+
 static void Game_draw(Game *game) {
+    const int LABEL_FONT_SIZE = 20;
+    int sw = game->width;
+    int sh = game->height;
+
     ClearBackground(GetGuiColor(DEFAULT, BACKGROUND_COLOR));
     DrawFPS(10, 10);
 
-    Rectangle r;
-    r.x = Game_center_x(game) - 50;
-    r.y = Game_center_y(game) - 50;
-    r.width = 100;
-    r.height = 100;
-    if (GuiButton(r, "Click me")) {
+    Vector2 pos = { 0 };
+    pos = UI_CenterPoint((Rectangle){ 0, 30, sw, sh - 30 });
+
+    if (GuiButtonCentered(pos, BTN_WIDTH, BTN_HEIGHT, "Click me")) {
         game->money += 1.0;
     }
 
-    char *text = TextFormat("Money: %g", game->money);
-    DrawText(text,
-        Game_center_x(game) - MeasureText(text, 20) / 2, 10,
-        20, GetGuiColor(LABEL, TEXT_COLOR_NORMAL));
+    char text[64];
+    snprintf(text, sizeof(text), "Money: %.2f", game->money);
+
+    DrawTextCenteredAt(pos.x, 10, text, LABEL_FONT_SIZE, GetGuiColor(LABEL, TEXT_COLOR_NORMAL));
 }
 
-static void Game_update(Game *game) {}
+static void Game_update(Game *game) {
+    if (IsWindowResized()) {
+        game->width = GetScreenWidth();
+        game->height = GetScreenHeight();
+    }
+}
 
 Result Game_run(Game *game) {
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE); 
     InitWindow(game->width, game->height, TITLE);
     SetTargetFPS(60);
 

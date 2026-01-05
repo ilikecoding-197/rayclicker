@@ -15,6 +15,7 @@ target_sources(rayclicker
 PRIVATE
 	src/main.c
   src/game.c
+  src/ui.c
 )
 
 # C99
